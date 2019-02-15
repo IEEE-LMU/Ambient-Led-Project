@@ -16,13 +16,15 @@ void setup() {
 	Serial.begin(115200);
 	Serial.println("resetting");
 	LEDS.addLeds<WS2812,DATA_PIN,RGB>(leds,NUM_LEDS);
-	LEDS.setBrightness(84);
+	LEDS.setBrightness(100);
 }
 
 void fadeall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(250); } }
 
+uint8_t hue = 0;
+
 void loop() { 
-	static uint8_t hue = 0;
+	/*static uint8_t hue = 0;
 	Serial.print("x");
 	// First slide the led in one direction
 	for(int i = 0; i < NUM_LEDS; i++) {
@@ -49,5 +51,13 @@ void loop() {
 		fadeall();
 		// Wait a little bit before we loop around and do it again
 		delay(10);
+	}*/
+	for(int i = 0; i < NUM_LEDS; i++) {
+			leds[i] = CHSV(hue, 255, 255);
 	}
+	FastLED.show();
+	Serial.println(hue);
+	delay(10);
+	hue = hue + 1;
+	hue = hue%255;
 }
