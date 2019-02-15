@@ -6,7 +6,7 @@
 // For led chips like Neopixels, which have a data line, ground, and power, you just
 // need to define DATA_PIN.  For led chipsets that are SPI based (four wires - data, clock,
 // ground, and power), like the LPD8806, define both DATA_PIN and CLOCK_PIN
-#define DATA_PIN 13
+#define DATA_PIN 12
 #define CLOCK_PIN 10
 
 // Define the array of leds

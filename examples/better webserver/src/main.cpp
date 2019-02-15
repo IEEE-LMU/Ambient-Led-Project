@@ -121,7 +121,10 @@ void setup(void) {
   }
 
   server.on("/", handleRoot);     //Define functions to be called when 
-  server.on("/test.svg", drawGraph);
+  //server.on("/test.svg", drawGraph);
+  server.on("/lmu",[]() {
+    server.send(200, "text/html", "<img src=\"https://marcomm.lmu.edu/wp-content/uploads/2017/01/university-logo.png\"/>\ ");
+  });
   server.on("/inline", []() {
     server.send(200, "text/plain", "this works as well");
   });

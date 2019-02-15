@@ -43,7 +43,9 @@ void setup(){
     }
 
     Serial.println("nndd..\nSuccess!");
-    Serial.println("IP: " + WiFi.localIP());
+    Serial.println("WiFi connected.");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
 
     
     srv.begin();
@@ -79,6 +81,9 @@ void loop(){
 
             // LMU Logo
             client.println("<img src=\"https://ibb.co/VMH3c7h\"/>\ ");
+            client.println();
+
+            break;
 
         }
     }
