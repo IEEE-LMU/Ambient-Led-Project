@@ -12,7 +12,6 @@
 #define DATA_PIN 12
 #define CLOCK_PIN 10
 
-
 const char *ssid = "LMU-Legacy";
 const char *password = "IggyLion1";
 
@@ -21,6 +20,9 @@ const String key = "e15b344c704836a858ce0c1aa62db3b1";
 
 // Define the array of leds
 CRGB leds[NUM_LEDS];
+
+CRGB daylight = CRGB(64, 156, 255);
+CRGB sunset = CRGB(99,37,33);
 
 void setup() {
 
@@ -35,7 +37,7 @@ void setup() {
 
   Serial.println("Connected to the WiFi network");
   LEDS.addLeds<WS2812,DATA_PIN,RGB>(leds,NUM_LEDS);
-	LEDS.setBrightness(84);
+	LEDS.setBrightness(255);
 
 }
 
@@ -78,5 +80,21 @@ void loop() {
   }
 
   delay(30000);*/
+  for (int i = 0; i < 100; i++){
+    //CRGB finalColor = daylight*(((float)i)/100.0f) + sunset*(((float)(100.0f-i))/100.0f);
+    for(int j = 0; j < NUM_LEDS; j++) {
+		  leds[j] = CRGB(255,0,0);
+    }
+    delay(100);
+    FastLED.show();
+    Serial.println("A");
+	}
+
+	/*FastLED.show();
+	Serial.println(hue);
+	delay(10);
+	hue = hue + 1;
+	hue = hue%255;*/
+  
 
 }

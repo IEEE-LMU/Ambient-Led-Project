@@ -16,7 +16,7 @@ void setup() {
 	Serial.begin(115200);
 	Serial.println("resetting");
 	LEDS.addLeds<WS2812,DATA_PIN,RGB>(leds,NUM_LEDS);
-	LEDS.setBrightness(100);
+	LEDS.setBrightness(255);
 }
 
 void fadeall() { for(int i = 0; i < NUM_LEDS; i++) { leds[i].nscale8(250); } }
@@ -53,7 +53,9 @@ void loop() {
 		delay(10);
 	}*/
 	for(int i = 0; i < NUM_LEDS; i++) {
-			leds[i] = CHSV(hue, 255, 255);
+			//leds[i] = CHSV(hue, 255, 255);
+			// G, R, B
+			leds[i] = CRGB(94,253,83);
 	}
 	FastLED.show();
 	Serial.println(hue);
