@@ -31,8 +31,11 @@ const String key = "e15b344c704836a858ce0c1aa62db3b1";
 
 const char* ntpServer = "pool.ntp.org";
 
-CRGB daylight = CRGB(64, 156, 255);
-CRGB sunset = CRGB(99,37,33);
+CRGB daylight = {198, 163, 255};
+CRGB sunset = {146, 255, 50};
+
+//GREEN, RED, BLUE
+
 
 CRGB leds[NUM_LEDS];
 
@@ -42,6 +45,8 @@ Mode mode;
 
 unsigned long lastWeatherPoll = 0;
 unsigned long lastLightUpdate = 0;
+
+int color = 0;
 
 void wifiConnect(){
   WiFi.begin(ssid, password);
@@ -127,7 +132,7 @@ void setup() {
   LEDS.addLeds<WS2812,DATA_PIN,RGB>(leds,NUM_LEDS);
 	LEDS.setBrightness(255);
 
-  mode = SUN;
+  mode = EFFECTS;
 }
 
 void loop() {
@@ -145,10 +150,12 @@ void loop() {
         long distToSunrise = weather.sunrise - currentTime;
         
         if (distToSunset < distToSunrise){
-          dimming = (distToSunset/SUN_TIME + 1.0)/2;  //1 if before sunset, 0 after sunset
+          dimming = (distToSunset/(SUN_TIME) + 1.0)/2;  //1 if before sunset, 0 after sunset
         }else{
-          dimming = (-distToSunrise/SUN_TIME + 1.0)/2;  //0 if before sunrise, 1 after sunrise
+          dimming = (-distToSunrise/(SUN_TIME) + 1.0)/2;  //0 if before sunrise, 1 after sunrise
         }
+
+        Serial.println(dimming);
 
         if (dimming <= 0.0f){
           dimming = 0.0f;
@@ -156,21 +163,33 @@ void loop() {
           dimming = 1.0f;
         }
 
+        dimming = 0;
+
         Serial.print("Scaling: ");
         Serial.println(dimming);
 
-        sendToAllLeds(sunset*(1-dimming) + daylight*dimming);
+        CRGB value;
+        value.r = sunset.r*(1.0f-dimming) + daylight.r*dimming;
+        value.g = sunset.g*(1.0f-dimming) + daylight.g*dimming;
+        value.b = sunset.b*(1.0f-dimming) + daylight.b*dimming;
+
+        sendToAllLeds(value);
 
         lastLightUpdate = millis();
       }
     break;
 
     case TEMP:
-
+    
     break;
 
     case EFFECTS:
-
+      if (millis() - lastLightUpdate > 10){
+        sendToAllLeds(CHSV(color,255,255));
+        color++;
+        color = color%255;
+        lastLightUpdate = millis();
+      }
     break;
   }
 }
