@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WebServer.h>
 #include <ArduinoJson.h>
 #include <time.h>
 #include <FastLED.h>
@@ -20,8 +21,11 @@ struct Weather {
 enum Mode {
   TEMP,
   SUN,
-  EFFECTS
+  EFFECTS,
+  OFF
 };
+
+bool modeChanged = true;
 
 const char *ssid = "LMU-Legacy";
 const char *password = "IggyLion1";
@@ -30,6 +34,8 @@ const String endpoint = "http://api.openweathermap.org/data/2.5/weather?id=53705
 const String key = "e15b344c704836a858ce0c1aa62db3b1";
 
 const char* ntpServer = "pool.ntp.org";
+
+WebServer server(80);
 
 CRGB daylight = {198, 163, 255};
 CRGB sunset = {146, 255, 50};
@@ -55,6 +61,8 @@ void wifiConnect(){
     Serial.println("Connecting to WiFi..");
   }
   Serial.println("Connected to the WiFi network");
+  Serial.print("IP address: ");
+  Serial.println(WiFi.localIP());
 }
 
 void setupTime(){
@@ -122,6 +130,14 @@ void sendToAllLeds(CRGB value){
   FastLED.show();
 }
 
+void handleRoot(){
+  char html [400];
+  snprintf(html, 400,
+   "<html>\nClick <a href=\"/TEMP\">here</a> for temperature mode.<br>\nClick <a href=\"/SUN\">here</a> for sunset mode.<br>\nClick <a href=\"/EFFECTS\">here</a> for effects mode<br>\nClick <a href=\"/OFF\">here</a> to turn LEDs off<br></html>"
+  );
+  server.send(200, "text/html", html);
+}
+
 void setup() {
   Serial.begin(115200);
   wifiConnect();
@@ -132,7 +148,25 @@ void setup() {
   LEDS.addLeds<WS2812,DATA_PIN,RGB>(leds,NUM_LEDS);
 	LEDS.setBrightness(255);
 
+  server.on("/", handleRoot);     //Define functions to be called when 
+  server.on("/TEMP",[]() {
+    mode = TEMP;
+  });
+  server.on("/SUN",[]() {
+    mode = SUN;
+  });
+  server.on("/EFFECTS",[]() {
+    mode = EFFECTS;
+  });
+  server.on("/OFF",[]() {
+    mode = OFF;
+    modeChanged = true;
+  });
+  server.begin();
+
   mode = EFFECTS;
+
+  
 }
 
 void loop() {
@@ -191,5 +225,14 @@ void loop() {
         lastLightUpdate = millis();
       }
     break;
+
+    case OFF:
+      if (modeChanged){
+        sendToAllLeds({0,0,0});
+      }else{
+        modeChanged = false;
+      }
+    break;
   }
+  server.handleClient();
 }
