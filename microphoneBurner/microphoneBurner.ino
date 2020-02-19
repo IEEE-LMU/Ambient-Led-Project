@@ -16,8 +16,8 @@ unsigned int sample;
 void setup() 
 {
    Serial.begin(9600);
-   LEDS.addLeds<WS2812B,DATA_PIN,RGB>(leds,NUM_LEDS);
- LEDS.setBrightness(84);
+   LEDS.addLeds<WS2812B,DATA_PIN,GRB>(leds,NUM_LEDS);
+  LEDS.setBrightness(84);
 }
  
  
@@ -28,7 +28,7 @@ void loop()
  
    unsigned int signalMax = 0;
    unsigned int signalMin = 1023;
- 
+
    // collect data for 50 mS
    while (millis() - startMillis < sampleWindow)
    {
@@ -45,16 +45,25 @@ void loop()
          }
       }
    }
-   peakToPeak = (signalMax - signalMin);  // max - min = peak-peak amplitude
+   peakToPeak = (299*(signalMax - signalMin))/600;  // max - min = peak-peak amplitude
    //double volts = (peakToPeak * 5.0) / 1024;  // convert to volts
-
-  for(int i = 0;i<299;i++)
+   int numLedsToFill = (double)((signalMax)-320);
+   if(numLedsToFill >300){numLedsToFill = 300;}
+   if(numLedsToFill <0){numLedsToFill = 0;}
+      unsigned int r = random(255);
+   unsigned int g = random(255);
+   unsigned int b = random(255);
+  for(int i = 0;i<300;i++)
   {
-    leds[i] = CHSV(peakToPeak,255,255);
+    if(i<numLedsToFill){leds[i].red = r; leds[i].green=g; leds[i].blue=b;}
+    else{leds[i]=CRGB::Black;}
+//    leds[i] = CRGB::Red;
+//    leds[i] = CHSV(peakToPeak,255,255);
    
   }
   FastLED.show();
-  delay(100);
+
+  
    
-   Serial.println(peakToPeak);
+   Serial.println(numLedsToFill);
 }
